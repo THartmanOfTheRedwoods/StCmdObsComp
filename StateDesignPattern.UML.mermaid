@@ -1,0 +1,51 @@
+classDiagram
+    note "State Design Pattern for Order Processing"
+    note for EcommerceOrderProcessor2 "Context Class\n\ncurrentState.processOrder()"
+    note for PaymentPendingState "Concrete State Class\n\nif (orderProcessor.getOrderTotal() > 0) {\norderProcessor.changeState(\nnew ItemsShippingState(orderProcessor));\norderProcessor.processOrder();\n}"
+    note for Client "EcommerceOrderProcessor2 orderProcessor\n= new EcommerceOrderProcessor2(100.00);\norderProcessor.processOrder();"
+    class Client {
+
+    }
+    class EcommerceOrderProcessor2 {
+        -double orderTotal
+        -OrderState currentState
+        +EcommerceOrderProcessor2(double)
+        +processOrder()
+        +changeState(OrderState)
+        +getOrderTotal()
+    }
+
+    class OrderState {
+        <<interface>>
+        +processOrder()
+    }
+
+    class PaymentPendingState {
+        -EcommerceOrderProcessor2 orderProcessor
+        +PaymentPendingState(EcommerceOrderProcessor2)
+        +processOrder()
+    }
+
+    class ItemsShippingState {
+        -EcommerceOrderProcessor2 orderProcessor
+        +ItemsShippingState(EcommerceOrderProcessor2)
+        +processOrder()
+    }
+
+    class OrderCompletedState {
+        -EcommerceOrderProcessor2 orderProcessor
+        +OrderCompletedState(EcommerceOrderProcessor2)
+        +processOrder()
+    }
+
+%% Single Responsibility, and Open/Closed principle applies.
+%% Easy to add a state to this simply by creating a new Concrete OrderState
+%% Each state only encapsulates its single responsibility in the transition.
+    Client --> EcommerceOrderProcessor2
+    EcommerceOrderProcessor2 *-- OrderState
+    PaymentPendingState ..|> OrderState
+    ItemsShippingState ..|> OrderState
+    OrderCompletedState ..|> OrderState
+    PaymentPendingState --> EcommerceOrderProcessor2
+    ItemsShippingState --> EcommerceOrderProcessor2
+    OrderCompletedState --> EcommerceOrderProcessor2
